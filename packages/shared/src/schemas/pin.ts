@@ -16,7 +16,7 @@ export const updatePinSchema = createPinSchema.partial();
 export const pinsQuerySchema = z.object({
   lat: z.coerce.number().min(-90).max(90).optional(),
   lng: z.coerce.number().min(-180).max(180).optional(),
-  place: z.string().min(2).max(120).optional(),
+  place: z.string().min(2).max(200).optional(),
   radiusKm: z.coerce.number().min(1).max(200).default(50),
   category: z.enum(PIN_CATEGORIES).optional(),
 });

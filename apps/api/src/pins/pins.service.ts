@@ -27,12 +27,14 @@ export class PinsService {
 
     let centerLat = params.lat;
     let centerLng = params.lng;
+    let centerZoom: number | undefined;
     let placeName: string | null = null;
 
     if (params.place) {
       const geocoded = await this.geo.geocodePlace(params.place);
       centerLat = geocoded.latitude;
       centerLng = geocoded.longitude;
+      centerZoom = geocoded.zoom;
       placeName = geocoded.placeName;
     }
 
@@ -72,7 +74,7 @@ export class PinsService {
     return {
       center:
         centerLat != null && centerLng != null
-          ? { latitude: centerLat, longitude: centerLng }
+          ? { latitude: centerLat, longitude: centerLng, zoom: centerZoom }
           : null,
       placeName,
       pins: items,

@@ -17,8 +17,15 @@ export interface PinListItem {
   };
 }
 
+export interface MapCenter {
+  latitude: number;
+  longitude: number;
+  /** Suggested map zoom (higher for street-level results) */
+  zoom?: number;
+}
+
 export interface PinsResponse {
-  center: { latitude: number; longitude: number } | null;
+  center: MapCenter | null;
   placeName: string | null;
   pins: PinListItem[];
 }

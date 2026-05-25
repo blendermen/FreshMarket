@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react';
 const OSM_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 
 interface MapViewProps {
-  center: { latitude: number; longitude: number } | null;
+  center: { latitude: number; longitude: number; zoom?: number } | null;
   pins: PinListItem[];
   selectedId: string | null;
   onSelectPin: (id: string) => void;
@@ -44,7 +44,7 @@ export function MapView({ center, pins, selectedId, onSelectPin }: MapViewProps)
     if (!map || !center) return;
     map.flyTo({
       center: [center.longitude, center.latitude],
-      zoom: 11,
+      zoom: center.zoom ?? 11,
       essential: true,
     });
   }, [center]);

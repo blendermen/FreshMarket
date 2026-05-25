@@ -1,6 +1,6 @@
 'use client';
 
-import type { PinListItem } from '@freshmarket/shared';
+import type { MapCenter, PinListItem } from '@freshmarket/shared';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useCallback, useState } from 'react';
@@ -13,7 +13,8 @@ export default function MapPage() {
   const { data: session } = useSession();
   const [place, setPlace] = useState('');
   const [pins, setPins] = useState<PinListItem[]>([]);
-  const [center, setCenter] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [center, setCenter] = useState<MapCenter | null>(null);
+  const [resolvedPlace, setResolvedPlace] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +27,7 @@ export default function MapPage() {
       const data = await fetchPins({ place: place.trim(), radiusKm: 50 });
       setPins(data.pins);
       setCenter(data.center);
+      setResolvedPlace(data.placeName);
       if (data.pins[0]) setSelectedId(data.pins[0].id);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Błąd wyszukiwania');
@@ -62,9 +64,10 @@ export default function MapPage() {
         >
           <input
             type="search"
-            placeholder="Miejscowość, np. Marki"
+            placeholder="Miejscowość lub ulica, np. Marki lub ul. Lipowa 3, Marki"
             value={place}
             onChange={(e) => setPlace(e.target.value)}
+            autoComplete="street-address"
             style={{
               flex: 1,
               padding: '0.6rem 1rem',
@@ -102,6 +105,20 @@ export default function MapPage() {
       {error && (
         <p style={{ margin: 0, padding: '0.5rem 1rem', background: '#fde8e8', color: '#9b2226' }}>
           {error}
+        </p>
+      )}
+      {resolvedPlace && !error && (
+        <p
+          style={{
+            margin: 0,
+            padding: '0.4rem 1rem',
+            fontSize: '0.85rem',
+            color: 'var(--muted)',
+            background: 'var(--surface)',
+            borderBottom: '1px solid var(--border)',
+          }}
+        >
+          Znaleziono: {resolvedPlace}
         </p>
       )}
       <div
