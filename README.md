@@ -95,6 +95,7 @@ infra/k8s     — manifesty k3s (base)
 | POST | `/v1/pins` | JWT |
 | POST | `/v1/auth/google` | public (sync po OAuth) |
 | POST | `/v1/media/presign` | JWT |
+| GET | `/v1/geo/suggest?q=Mark` | public (autouzupełnianie, min. 3 znaki) |
 
 ## k3s
 

@@ -7,6 +7,10 @@ import { useCallback, useState } from 'react';
 import { GoogleTokenSync } from '@/components/GoogleTokenSync';
 import { MapView } from '@/components/MapView';
 import { PinPanel } from '@/components/PinPanel';
+import {
+  PlaceSearchInput,
+  type PlaceSearchPayload,
+} from '@/components/PlaceSearchInput';
 import { fetchPins } from '@/lib/api';
 
 export default function MapPage() {
@@ -19,22 +23,32 @@ export default function MapPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const search = useCallback(async () => {
-    if (!place.trim()) return;
+  const runSearch = useCallback(async ({ place: queryPlace, center: preset }: PlaceSearchPayload) => {
+    const trimmed = queryPlace.trim();
+    if (!trimmed && !preset) return;
+
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchPins({ place: place.trim(), radiusKm: 50 });
+      const data = await fetchPins(
+        preset
+          ? {
+              lat: preset.latitude,
+              lng: preset.longitude,
+              radiusKm: 50,
+            }
+          : { place: trimmed, radiusKm: 50 },
+      );
       setPins(data.pins);
-      setCenter(data.center);
-      setResolvedPlace(data.placeName);
+      setCenter(preset ?? data.center);
+      setResolvedPlace(data.placeName ?? trimmed);
       if (data.pins[0]) setSelectedId(data.pins[0].id);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Błąd wyszukiwania');
     } finally {
       setLoading(false);
     }
-  }, [place]);
+  }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
@@ -59,22 +73,14 @@ export default function MapPage() {
           style={{ flex: 1, display: 'flex', gap: '0.5rem', minWidth: 200 }}
           onSubmit={(e) => {
             e.preventDefault();
-            search();
+            runSearch({ place });
           }}
         >
-          <input
-            type="search"
-            placeholder="Miejscowość lub ulica, np. Marki lub ul. Lipowa 3, Marki"
+          <PlaceSearchInput
             value={place}
-            onChange={(e) => setPlace(e.target.value)}
-            autoComplete="street-address"
-            style={{
-              flex: 1,
-              padding: '0.6rem 1rem',
-              border: '1px solid var(--border)',
-              borderRadius: 999,
-              background: 'var(--bg)',
-            }}
+            onChange={setPlace}
+            onSearch={runSearch}
+            loading={loading}
           />
           <button
             type="submit"

@@ -1,5 +1,6 @@
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { PlaceSuggestion } from '@freshmarket/shared';
 
 export interface GeocodedPlace {
   placeName: string;
@@ -32,6 +33,36 @@ export class GeoService {
   private readonly logger = new Logger(GeoService.name);
 
   constructor(private readonly config: ConfigService) {}
+
+  async suggestPlaces(query: string): Promise<PlaceSuggestion[]> {
+    const trimmed = query.trim();
+    if (trimmed.length < 3) return [];
+
+    const preferStreet = STREET_HINT.test(trimmed);
+    const results = await this.nominatimSearch({ q: trimmed });
+    const ranked = preferStreet
+      ? [...results].sort(
+          (a, b) => this.scoreResult(b, preferStreet) - this.scoreResult(a, preferStreet),
+        )
+      : results;
+
+    const seen = new Set<string>();
+    const suggestions: PlaceSuggestion[] = [];
+
+    for (const result of ranked) {
+      if (suggestions.length >= 6) break;
+      if (seen.has(result.display_name)) continue;
+      seen.add(result.display_name);
+      suggestions.push({
+        label: result.display_name,
+        latitude: parseFloat(result.lat),
+        longitude: parseFloat(result.lon),
+        zoom: this.zoomForResult(result),
+      });
+    }
+
+    return suggestions;
+  }
 
   async geocodePlace(place: string): Promise<GeocodedPlace> {
     const parsed = this.parseAddressQuery(place.trim());

@@ -1,4 +1,4 @@
-import type { PinsResponse } from '@freshmarket/shared';
+import type { PinsResponse, PlaceSuggestion } from '@freshmarket/shared';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
 
@@ -22,6 +22,14 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error(text || res.statusText);
   }
   return res.json() as Promise<T>;
+}
+
+export function fetchPlaceSuggestions(
+  q: string,
+  signal?: AbortSignal,
+): Promise<PlaceSuggestion[]> {
+  const search = new URLSearchParams({ q: q.trim() });
+  return apiFetch<PlaceSuggestion[]>(`/geo/suggest?${search.toString()}`, { signal });
 }
 
 export function fetchPins(params: {
