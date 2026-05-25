@@ -59,7 +59,10 @@ cp .env.example apps/web/.env.local
 # 4. Baza
 pnpm db:migrate
 
-# 5. Dev (web :3000, api :4000)
+# 5. Przykładowe pinezki (Opoczno)
+pnpm db:seed
+
+# 6. Dev (web :3000, api :4000)
 pnpm dev
 ```
 
@@ -121,6 +124,14 @@ Dłuższy timeout npm (gdy i tak musisz użyć npm do czegoś innego):
 npm config set fetch-timeout 300000
 npm config set fetch-retries 5
 ```
+
+## Seed (Opoczno)
+
+```bash
+pnpm db:seed
+```
+
+Dodaje 7 przykładowych ofert od 5 sprzedawców w okolicy Opoczna. Na mapie wpisz **Opoczno** i kliknij Szukaj (lub wybierz z podpowiedzi). Ponowne uruchomienie seeda odświeża te dane.
 
 ## Następne kroki
 
