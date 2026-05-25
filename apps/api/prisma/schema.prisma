@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  credentials
+  google
+}
+
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  name         String
+  avatarKey    String?
+  provider     AuthProvider @default(credentials)
+  passwordHash String?
+  googleId     String?      @unique
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  pins         Pin[]
+}
+
+model Pin {
+  id          String     @id @default(cuid())
+  title       String
+  description String
+  category    String
+  latitude    Float
+  longitude   Float
+  priceLabel  String?
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos      PinPhoto[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([latitude, longitude])
+  @@index([category])
+  @@index([userId])
+}
+
+model PinPhoto {
+  id        String @id @default(cuid())
+  pinId     String
+  pin       Pin    @relation(fields: [pinId], references: [id], onDelete: Cascade)
+  objectKey String
+  sortOrder Int    @default(0)
+
+  @@index([pinId])
+}

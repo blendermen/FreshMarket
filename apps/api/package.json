@@ -1,0 +1,44 @@
+{
+  "name": "@freshmarket/api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "dev": "nest start --watch",
+    "start": "node dist/main",
+    "lint": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.787.0",
+    "@aws-sdk/s3-request-presigner": "^3.787.0",
+    "@freshmarket/shared": "workspace:*",
+    "@nestjs/common": "^11.0.20",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.0.20",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.0.20",
+    "@prisma/client": "^6.6.0",
+    "bcrypt": "^5.1.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@freshmarket/tsconfig": "workspace:*",
+    "@nestjs/cli": "^11.0.6",
+    "@nestjs/schematics": "^11.0.5",
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.14.1",
+    "@types/passport-jwt": "^4.0.1",
+    "prisma": "^6.6.0",
+    "typescript": "^5.8.3"
+  }
+}
