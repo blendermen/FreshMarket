@@ -1,9 +1,11 @@
 'use client';
 
-import type { PinListItem } from '@freshmarket/shared';
+import type { PinCategory, PinListItem } from '@freshmarket/shared';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useEffect, useRef } from 'react';
+import { createCategoryMarkerElement } from '@/lib/categoryMarkers';
+import { MapLegend } from './MapLegend';
 
 const OSM_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 
@@ -57,19 +59,13 @@ export function MapView({ center, pins, selectedId, onSelectPin }: MapViewProps)
     markersRef.current = [];
 
     for (const pin of pins) {
-      const el = document.createElement('button');
-      el.type = 'button';
-      el.className = 'pin-marker';
-      el.title = pin.title;
-      el.style.cssText = `
-        width: 28px; height: 28px; border-radius: 50%;
-        border: 2px solid #fff;
-        background: ${pin.id === selectedId ? '#1b4332' : '#2d6a4f'};
-        cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.25);
-      `;
+      const el = createCategoryMarkerElement(pin.category as PinCategory, {
+        selected: pin.id === selectedId,
+        title: pin.title,
+      });
       el.addEventListener('click', () => onSelectPin(pin.id));
 
-      const marker = new maplibregl.Marker({ element: el })
+      const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
         .setLngLat([pin.longitude, pin.latitude])
         .addTo(map);
       markersRef.current.push(marker);
@@ -78,8 +74,19 @@ export function MapView({ center, pins, selectedId, onSelectPin }: MapViewProps)
 
   return (
     <div
-      ref={containerRef}
-      style={{ width: '100%', height: '100%', minHeight: 280, borderRadius: 'inherit' }}
-    />
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        minHeight: 280,
+        borderRadius: 'inherit',
+      }}
+    >
+      <div
+        ref={containerRef}
+        style={{ width: '100%', height: '100%', minHeight: 280, borderRadius: 'inherit' }}
+      />
+      {pins.length > 0 && <MapLegend />}
+    </div>
   );
 }
